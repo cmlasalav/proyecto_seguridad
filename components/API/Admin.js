@@ -24,17 +24,16 @@ export const GetAdminData = async () => {
 };
 
 //Update Admin Data
-export const UpdateData = async (_id, typeData) => {
+export const UpdateData = async (_id, typeData, data) => {
   try {
-    const res = await instance.put(`/token/${_id}?typeData=${typeData}`, {
+    const res = await instance.put(`/token/${_id}?typeData=${typeData}`, data, {
       withCredentials: true,
     });
     return res.data;
   } catch (err) {
     return {
       error:
-        error.response?.data?.message ||
-        "Error al editar datos de administrador",
+        err.response?.data?.message || "Error al editar datos de administrador",
     };
   }
 };

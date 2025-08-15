@@ -9,6 +9,7 @@ import { showToast } from "@components/Extra/ToastMessage";
 import UserModal from "../Modals/UserModal";
 import ServiceModal from "../Modals/ServiceModal";
 import LoadingScreen from "../Extra/Loader";
+import ConfirmationModal from "../Modals/ConfirmationModal";
 
 type User = {
   _id: string;
@@ -40,6 +41,13 @@ export default function AdminPage() {
   //Selected Service and User
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{
+    type: "Users" | "Services";
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
@@ -76,11 +84,9 @@ export default function AdminPage() {
     return <LoadingScreen message="Verificando permisos..." />;
   }
 
-  const handleDeleteData = async (
-    id: string,
-    typeData: "Users" | "Services"
-  ) => {
+  const deleteData = async (id: string, typeData: "Users" | "Services") => {
     setLoading(true);
+    setIsDeleting(true);
     try {
       const response = await DeleteAdminData(id, typeData);
 
@@ -97,7 +103,16 @@ export default function AdminPage() {
       console.error("Error al eliminar:", error);
     } finally {
       setLoading(false);
+      setIsDeleting(false);
     }
+  };
+  const handleDeleteData = (
+    id: string,
+    typeData: "Users" | "Services",
+    name: string
+  ) => {
+    setItemToDelete({ id, type: typeData, name });
+    setIsDeleteModalOpen(true);
   };
 
   //Edit Service and User
@@ -226,7 +241,13 @@ export default function AdminPage() {
                       Editar
                     </button>
                     <button
-                      onClick={() => handleDeleteData(service._id, "Services")}
+                      onClick={() =>
+                        handleDeleteData(
+                          service._id,
+                          "Services",
+                          service.ServiceName
+                        )
+                      }
                       className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm"
                     >
                       Eliminar
@@ -303,7 +324,9 @@ export default function AdminPage() {
                             Editar
                           </button> */}
                           <button
-                            onClick={() => handleDeleteData(user._id, "Users")}
+                            onClick={() =>
+                              handleDeleteData(user._id, "Users", user.name)
+                            }
                             className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm"
                           >
                             Eliminar
@@ -330,6 +353,19 @@ export default function AdminPage() {
         onClose={() => setIsUserStatusModalOpen(false)}
         user={selectedUser}
         onSave={handleSaveUserStatus}
+      />
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={() =>
+          deleteData(itemToDelete?.id!, itemToDelete?.type || "Users")
+        }
+        itemType={itemToDelete?.type || "Users"}
+        itemData={itemToDelete?.name ?? null}
+        isLoading={isDeleting}
       />
     </div>
   );
