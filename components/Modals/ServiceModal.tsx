@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import { showToast } from "../Extra/ToastMessage";
-import { PostService } from "../API/Admin";
+import { PostService, UpdateData } from "../API/Admin";
 
 interface Service {
   _id: string;
@@ -40,7 +40,10 @@ export default function EditServiceModal({
 
   useEffect(() => {
     if (service) {
-      setFormData(service);
+      setFormData({
+        ...service,
+        ServicePrice: String(service.ServicePrice),
+      });
     }
   }, [service]);
 
@@ -88,16 +91,24 @@ export default function EditServiceModal({
     if (!validateForm()) {
       return;
     }
+
     setIsLoading(true);
+    let response;
     // console.log(formData);
-    const response = await PostService(formData);
+    if (formData._id) {
+      response = await UpdateData(formData._id, formData, "Services");
+    } else {
+      response = await PostService(formData);
+    }
+
     if (response.ok) {
       showToast(response.message || "Desconocido", "success");
       setTimeout(() => {
         onSave(formData);
         setIsLoading(false);
         onClose();
-      }, 1000);
+      }, 2000);
+      window.location.reload();
     } else {
       showToast(response.error || "Desconocido", "error");
       setIsLoading(false);

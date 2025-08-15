@@ -3,6 +3,7 @@
 import React from "react";
 import { useState } from "react";
 import { UpdateData } from "../API/Admin";
+import { showToast } from "@components/Extra/ToastMessage";
 
 interface User {
   _id: string;
@@ -34,11 +35,22 @@ export default function EditUserStatusModal({
 
     if (!user) return;
 
-    // setIsLoading(true);
-    const updatedUser = { ...user, status: newStatus };
-    console.log(updatedUser.status);
-    // const response = await UpdateData(user, "user");
-    // Simular guardado
+    setIsLoading(true);
+    const updatedUser = { ...user, userStatus: newStatus };
+
+    const response = await UpdateData(updatedUser._id, "Users", updatedUser);
+    console.log(response);
+    if (response.ok) {
+      showToast(response.message || "Desconocido", "success");
+      setTimeout(() => {
+        setIsLoading(false);
+        onClose();
+      }, 2000);
+      window.location.reload();
+    } else {
+      showToast(response.error || "Desconocido", "error");
+      setIsLoading(false);
+    }
     setIsLoading(false);
     handleClose();
   };
