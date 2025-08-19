@@ -23,6 +23,22 @@ export const GetAdminData = async () => {
   }
 };
 
+//Get Admin Logs
+export const GetAdminLogs = async () => {
+  try {
+    const res = await instance.get("/token/logs", {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    return {
+      error:
+        error.response?.data?.message ||
+        "Error al obtener datos de administrador",
+    };
+  }
+};
+
 //Update Admin Data
 export const UpdateData = async (_id, typeData, data) => {
   try {
