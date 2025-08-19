@@ -39,7 +39,7 @@ export default function EditUserStatusModal({
     const updatedUser = { ...user, userStatus: newStatus };
 
     const response = await UpdateData(updatedUser._id, "Users", updatedUser);
-    console.log(response);
+    // console.log(response);
     if (response.ok) {
       showToast(response.message || "Desconocido", "success");
       setTimeout(() => {

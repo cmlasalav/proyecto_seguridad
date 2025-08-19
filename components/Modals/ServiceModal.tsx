@@ -96,7 +96,7 @@ export default function EditServiceModal({
     let response;
     // console.log(formData);
     if (formData._id) {
-      response = await UpdateData(formData._id, formData, "Services");
+      response = await UpdateData(formData._id, "Services", formData);
     } else {
       response = await PostService(formData);
     }
