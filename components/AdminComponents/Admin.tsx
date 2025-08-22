@@ -145,6 +145,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     setLoading(true);
     const response = await LogoutUser();
+    // console.log(response);
     if (response) {
       setIsAuthenticated(false);
       router.push("/");
